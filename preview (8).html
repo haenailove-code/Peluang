@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>PULAN — Petualangan Peluang</title>
+<style>
+:root{
+  --pink:#f8b9d1; --pink2:#fff0f6; --green:#b9e4c3; --green2:#effaf2;
+  --yellow:#f5e4a5; --yellow2:#fff9e7; --purple:#d9c5ef; --purple2:#f7f0fc;
+  --ink:#3e2940; --muted:#756475; --line:#ead8e3; --white:#fffdfc;
+  --shadow:0 10px 28px rgba(93,53,83,.10);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:"Trebuchet MS",system-ui,sans-serif;color:var(--ink);background:#f9f7fb}
+button{font:inherit;cursor:pointer}
+body{padding:12px}
+.app{width:min(1500px,100%);margin:auto}
+.screen{display:none;min-height:calc(100vh - 24px);border:2px solid var(--line);border-radius:24px;overflow:hidden;box-shadow:var(--shadow)}
+.screen.active{display:flex;flex-direction:column}
+.top{height:74px;background:rgba(255,255,255,.88);display:flex;align-items:center;justify-content:space-between;padding:10px 18px;border-bottom:2px solid rgba(234,216,227,.65)}
+.top-left{display:flex;align-items:center;gap:10px}.back,.gear,.profile{border:2px solid #e7cedb;background:#fff;border-radius:50%;width:44px;height:44px;display:grid;place-items:center;font-size:21px}
+.level-pill{background:#fff;border:2px solid #e5cdd8;border-radius:999px;padding:10px 18px;font-weight:900;font-size:15px}
+.progress-wrap{display:flex;align-items:center;gap:9px}.progress-dots{display:flex;gap:7px}.dot{width:12px;height:12px;border-radius:50%;background:#eedde7}.dot.on{background:#86c69c}.progress-num{font-weight:900;color:#d09b35}
+.profile{border-radius:18px;width:auto;padding:7px 12px;display:flex;gap:7px;font-size:12px}
+.main{flex:1;position:relative}
+/* Home */
+#home{background:linear-gradient(180deg,#70d3f5 0%,#dff5ff 58%,#f7f0ff 100%)}
+.home-wrap{height:100%;display:grid;grid-template-rows:1fr auto}
+.home-hero{position:relative;min-height:690px;overflow:hidden}
+.stars{position:absolute;inset:0;pointer-events:none}.star{position:absolute;color:#fff;filter:drop-shadow(0 3px 2px rgba(80,70,100,.1));font-size:24px}.star:nth-child(1){left:15%;top:8%}.star:nth-child(2){left:28%;top:24%}.star:nth-child(3){right:28%;top:12%}.star:nth-child(4){right:16%;top:35%}.star:nth-child(5){left:45%;top:10%}.star:nth-child(6){left:6%;top:42%}
+.cloud{position:absolute;background:#fff;border-radius:999px;opacity:.95}.cloud:before,.cloud:after{content:"";position:absolute;background:#fff;border-radius:50%}.c1{width:220px;height:52px;left:6%;top:11%}.c1:before{width:75px;height:75px;left:35px;bottom:5px}.c1:after{width:95px;height:95px;right:35px;bottom:4px}.c2{width:180px;height:44px;right:12%;top:8%}.c2:before{width:60px;height:60px;left:28px;bottom:2px}.c2:after{width:70px;height:70px;right:25px;bottom:1px}
+.planet{position:absolute;left:7%;top:8%;font-size:64px;transform:rotate(-8deg)}
+.home-content{position:relative;z-index:2;height:100%;display:grid;grid-template-columns:1fr 1.05fr;gap:20px;align-items:center;padding:40px 50px}
+.home-copy{padding-top:34px}.home-copy h1{font-size:94px;line-height:.8;margin:0;text-align:center;letter-spacing:-7px;color:#f6a9c9;text-shadow:0 6px 0 #fff, 9px 11px 0 #ba7a9e;font-weight:1000}.subtitle{display:inline-block;margin:14px auto 8px;display:block;width:max-content;background:#e9c48c;border:4px solid #fff;border-radius:17px;padding:9px 20px;color:#694f4a;font-weight:1000;font-size:23px;transform:rotate(-2deg)}.home-copy .tagline{background:rgba(255,255,255,.95);border:2px solid #e3c8d8;display:block;width:max-content;max-width:90%;margin:16px auto 20px;padding:7px 16px;border-radius:999px;font-size:13px;font-weight:800;transform:rotate(-2deg)}
+.start-btn{display:flex;margin:22px auto 0;align-items:center;justify-content:center;gap:12px;width:290px;border:0;border-radius:24px;padding:16px 22px;background:#7fda8f;color:#fff;font-size:24px;font-weight:1000;border:4px solid #fff;box-shadow:0 8px 0 #61ba72,0 12px 22px rgba(63,99,68,.14)}
+.scene{position:relative;height:520px}.hill1,.hill2{position:absolute;bottom:-100px;border-radius:50%;}.hill1{left:-50px;width:720px;height:300px;background:#b8e0bd}.hill2{right:-100px;width:640px;height:260px;background:#a6d8b0}.path-home{position:absolute;left:50%;bottom:-40px;transform:translateX(-50%);width:220px;height:330px;background:#f8e6a6;clip-path:polygon(43% 0,57% 0,100% 100%,0 100%)}
+.home-links{background:rgba(255,255,255,.92);border:2px solid #e0c8d5;border-radius:24px;margin:0 36px 26px;padding:12px;display:grid;grid-template-columns:repeat(3,1fr);gap:0;box-shadow:var(--shadow);position:relative;z-index:4}.home-links button{background:transparent;border:0;border-right:2px solid #e3d0d9;padding:10px;font-weight:900;color:var(--ink);font-size:16px}.home-links button:last-child{border-right:0}
+/* characters */
+.girl,.boy{position:absolute;width:190px;height:290px;bottom:34px}.girl{left:12%}.boy{right:10%}.char-head{position:absolute;left:44px;top:16px;width:104px;height:104px;border-radius:48%;background:#ffd8ba;border:5px solid #c88168;z-index:4}.girl .hair{position:absolute;left:29px;top:0;width:135px;height:125px;background:#4b343f;border-radius:55% 52% 40% 48%;z-index:3}.girl .hair2{position:absolute;left:20px;top:58px;width:45px;height:145px;background:#4b343f;border-radius:60px;z-index:1}.boy .hair{position:absolute;left:35px;top:4px;width:122px;height:95px;background:#4b343f;border-radius:56% 48% 38% 40%;z-index:3}.eye2{position:absolute;top:60px;width:11px;height:15px;background:#3e2934;border-radius:50%;z-index:5}.eye2.l{left:72px}.eye2.r{left:109px}.smile2{position:absolute;left:86px;top:83px;width:22px;height:13px;border-bottom:4px solid #a8666a;border-radius:0 0 20px 20px;z-index:5}.body-char{position:absolute;left:28px;top:118px;width:137px;height:124px;background:#efb3cd;border:5px solid #cf89aa;border-radius:34px 34px 24px 24px;z-index:2}.boy .body-char{background:#b5cfe7;border-color:#8baac6}.arm2{position:absolute;top:138px;width:70px;height:24px;background:#ffd8ba;border:5px solid #c88168;border-radius:20px;z-index:1}.arm2.l{left:3px;transform:rotate(30deg)}.arm2.r{right:0;transform:rotate(-22deg)}.book-char{position:absolute;right:0;top:130px;width:48px;height:40px;background:#fff6cb;border:3px solid #c5a35e;border-radius:6px;transform:rotate(-11deg);z-index:5}.bag-char{position:absolute;right:1px;top:114px;width:48px;height:92px;border-radius:18px;background:#8ea9cf;border:4px solid #708bb0;z-index:1;transform:rotate(-8deg)}.rabbit{position:absolute;width:120px;height:126px;z-index:6}.rabbit-body{position:absolute;left:25px;top:46px;width:73px;height:70px;background:#fff;border:4px solid #d6cbd1;border-radius:45% 45% 40% 40%}.ear{position:absolute;width:29px;height:54px;background:#fff;border:4px solid #d6cbd1;border-radius:60%;top:3px;z-index:1}.ear.l{left:30px;transform:rotate(-7deg)}.ear.r{right:28px;transform:rotate(8deg)}.inner-ear{position:absolute;width:12px;height:27px;background:#f7b4c9;border-radius:50%;left:5px;top:9px}.face-r{position:absolute;inset:20px 12px}.eye-r{position:absolute;top:15px;width:6px;height:9px;background:#443443;border-radius:50%}.eye-r.l{left:15px}.eye-r.r{right:15px}.nose-r{position:absolute;left:31px;top:25px;width:8px;height:6px;background:#e4a1b8;border-radius:50%}.rabbit .smile-r{position:absolute;left:28px;top:31px;width:14px;height:8px;border-bottom:3px solid #9c6b74;border-radius:0 0 10px 10px}
+/* Common game */
+.game-bg{height:100%;padding-bottom:20px}.screen-inner{padding:20px 36px}.speech{background:#fff;border:2px solid #ead5df;border-radius:18px;padding:14px 16px;font-weight:800;font-size:14px;box-shadow:0 5px 12px rgba(88,49,76,.07)}.screen-title{font-size:33px;margin:0 0 6px}.screen-lead{margin:0;color:var(--muted);line-height:1.5;font-size:13px}
+/* level 1 */
+#level1{background:linear-gradient(180deg,#ffd0df,#fff7f8)}.level1-head{display:grid;grid-template-columns:1.1fr .9fr;gap:20px;align-items:center;padding:26px 40px 10px}.tiny-title{display:inline-block;padding:8px 12px;background:#fff;border:2px solid #e8cfd9;border-radius:999px;font-size:13px;font-weight:900}.mascot-area{position:relative;height:170px}.mascot-area .girl{left:8%;bottom:-12px;transform:scale(.58);transform-origin:bottom left}.mascot-area .rabbit{right:15px;bottom:5px;transform:scale(.85)}.concept-ribbon{margin:8px 40px 0;display:inline-block;background:#f18aad;color:#fff;font-weight:1000;padding:10px 22px;border-radius:12px;transform:rotate(-1deg);box-shadow:0 5px 0 #d57196}.concept-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;padding:0 40px;margin-top:14px}.concept-card{border:2px solid #ead5df;border-radius:18px;padding:16px;min-height:168px;box-shadow:var(--shadow)}.concept-card:nth-child(1){background:var(--pink2)}.concept-card:nth-child(2){background:var(--yellow2)}.concept-card:nth-child(3){background:var(--green2)}.concept-card:nth-child(4){background:var(--purple2)}.concept-card h4{margin:6px 0;font-size:16px}.concept-card p{margin:0;color:var(--muted);font-size:12px;line-height:1.45}.mini-work{background:rgba(255,255,255,.8);padding:9px;border-radius:12px;margin-top:10px;font-size:11px;font-weight:800}.formula{margin:14px 40px 0;background:#efe0ff;border:2px solid #cdb0ea;border-radius:18px;padding:13px 18px;font-size:18px;text-align:center;font-weight:900}.formula small{display:block;color:var(--muted);font-size:11px;font-weight:700;margin-top:3px}.concrete-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:14px 40px 0}.concrete{background:#fff;border:2px solid #ead5df;border-radius:17px;padding:14px}.tag{font-size:10px;font-weight:1000;color:#ad6b86}.concrete h4{margin:6px 0;font-size:15px}.concrete p{font-size:12px;color:var(--muted);line-height:1.5;margin:0}.next-row{display:flex;justify-content:flex-end;padding:14px 40px 0}.green-btn{background:#7fd497;color:#fff;border:0;border-radius:17px;padding:12px 20px;font-weight:1000;border-bottom:4px solid #61b476}.green-btn:disabled{opacity:.55;cursor:not-allowed}
+/* level2 */
+#level2{background:linear-gradient(180deg,#dff5d9,#f8fff4)}.level2-layout{display:grid;grid-template-columns:340px 1fr;gap:20px;padding:24px 40px}.wheel-card{background:#fff;border:2px solid #dce8dc;border-radius:20px;padding:18px;text-align:center}.wheel{width:230px;height:230px;border-radius:50%;margin:8px auto 14px;border:7px solid #fff;box-shadow:0 0 0 4px #8ec7a0,0 8px 22px rgba(55,95,66,.13);background:conic-gradient(#f5c0d3 0 45deg,#f7e59f 45deg 135deg,#b8e5c3 135deg 225deg,#f7c1d6 225deg 315deg,#f7e59f 315deg 360deg);position:relative}.wheel:after{content:"";position:absolute;left:50%;top:50%;width:20px;height:20px;transform:translate(-50%,-50%);background:#fff;border-radius:50%;border:4px solid #9f7ea1}.pointer{font-size:40px;line-height:1;color:#de719b}.explore-card{background:#fff;border:2px solid #dce8dc;border-radius:20px;padding:18px}.explore-card h4{font-size:19px;margin:0 0 7px}.explore-card p{font-size:13px;color:var(--muted);line-height:1.55}.choice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.choice{border:2px solid #dfd8df;background:#fff;border-radius:16px;padding:12px;font-weight:900;text-align:left}.choice.correct{background:#c8e8cc;border-color:#78b486}.choice.wrong{background:#ffe0e8;border-color:#dfa1b6}.choice:disabled{opacity:.95}
+/* level3 */
+#level3{background:linear-gradient(180deg,#ffe1ea,#fffafc)}.quiz-wrap{padding:25px 40px}.quiz-status{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}.status-pill{background:#fff;border:2px solid #ebd7e0;border-radius:999px;padding:7px 11px;font-weight:900;font-size:12px}.quiz-card{background:#fff;border:2px solid #ead5df;border-radius:18px;padding:18px}.quiz-card h4{font-size:18px;line-height:1.45;margin:0 0 14px}.opt-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.opt{border:2px solid #ead5df;background:#fff8fb;border-radius:15px;padding:13px;text-align:left;font-weight:900}.opt.correct{background:#d2efcf;border-color:#7ebd8a}.opt.wrong{background:#ffe0e8;border-color:#e2a1b8}.feedback{display:none;margin-top:12px;background:#f3e8fd;border:2px solid #d9c0ee;border-radius:15px;padding:11px;font-size:12px;line-height:1.5}.feedback.show{display:block}.coach-row{display:grid;grid-template-columns:1fr 260px;gap:12px;align-items:end;margin-top:12px}.coach{background:#fff;border:2px solid #ead5df;border-radius:18px;padding:11px;font-size:12px;font-weight:800}.score-badge{background:#fff0f4;border:2px solid #edc1d2;border-radius:15px;padding:12px;text-align:center;font-weight:1000}
+/* level4 */
+#level4{background:linear-gradient(180deg,#dccaf3,#fff4fa)}.boss-banner{display:grid;grid-template-columns:1fr 1fr;align-items:center;gap:10px;padding:18px 40px 0}.boss-title{font-size:46px;font-weight:1000;color:#e45f93;text-shadow:0 4px 0 #fff;margin:0}.cat-boss{justify-self:end;font-size:110px;filter:drop-shadow(0 8px 0 rgba(70,43,73,.08))}.boss-card{margin:0 40px 18px;background:#fff;border:2px solid #ead5df;border-radius:19px;padding:17px}.boss-card h4{font-size:18px;margin:0 0 13px}.boss-actions{display:flex;justify-content:flex-end;margin-top:12px}
+/* result */
+#result{background:linear-gradient(180deg,#ffd3e4,#fff8fc)}.result-wrap{display:grid;grid-template-columns:1fr 420px;align-items:center;gap:20px;min-height:100%;padding:36px 60px}.result-hero{text-align:center}.result-hero h2{font-size:64px;color:#e56b9b;text-shadow:0 5px 0 #fff;margin:8px 0}.result-hero p{color:var(--muted);font-size:14px;line-height:1.5}.final-card{background:#fff;border:2px solid #ead5df;border-radius:22px;padding:20px;text-align:center}.final-score{font-size:38px;font-weight:1000;color:#d59a35;margin:8px 0 12px}.badge{display:inline-block;background:#d8c0f0;border:2px solid #a68bc6;border-radius:999px;padding:10px 14px;font-size:12px;font-weight:1000}.result-character{position:relative;height:220px;margin-top:14px}.result-character .girl{left:18%;transform:scale(.65);transform-origin:bottom left;bottom:-18px}.result-character .rabbit{right:8%;bottom:0;transform:scale(1.0)}
+.toast{position:fixed;right:24px;bottom:22px;background:#fff;border:2px solid #ead5df;border-radius:16px;padding:12px 15px;box-shadow:var(--shadow);font-size:12px;font-weight:900;opacity:0;transform:translateY(10px);pointer-events:none;transition:.25s}.toast.show{opacity:1;transform:translateY(0)}
+@media(max-width:1100px){.home-content{grid-template-columns:1fr}.scene{display:none}.home-copy{padding-bottom:40px}.concept-grid{grid-template-columns:1fr 1fr}.level1-head{grid-template-columns:1fr}.mascot-area{display:none}.level2-layout{grid-template-columns:1fr}.result-wrap{grid-template-columns:1fr}.result-character{display:none}}
+@media(max-width:720px){body{padding:6px}.screen{min-height:calc(100vh - 12px)}.top{height:auto;min-height:68px;padding:9px}.level-pill{font-size:12px;padding:8px 10px}.progress-wrap{display:none}.profile{font-size:10px}.home-content{padding:30px 20px}.home-copy h1{font-size:64px;letter-spacing:-4px}.subtitle{font-size:16px}.start-btn{width:230px;font-size:18px}.home-links{margin:0 10px 12px}.home-links button{font-size:11px}.screen-inner,.concept-grid,.concrete-grid,.quiz-wrap{padding-left:15px;padding-right:15px}.concept-grid,.concrete-grid,.opt-grid,.choice-grid{grid-template-columns:1fr}.formula,.next-row,.boss-card,.boss-banner{margin-left:15px;margin-right:15px;padding-left:0;padding-right:0}.boss-banner{grid-template-columns:1fr}.cat-boss{justify-self:center;font-size:80px}.boss-title{font-size:34px}.result-wrap{padding:25px 15px}.result-hero h2{font-size:45px}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<section class="screen active" id="home">
+  <div class="top"><div class="top-left"><div class="gear">⚙️</div></div><div class="profile"><span>👩🏻‍🎓</span> Profil</div></div>
+  <div class="main home-wrap">
+    <div class="home-hero">
+      <div class="stars"><span class="star">⭐</span><span class="star">✦</span><span class="star">★</span><span class="star">✦</span><span class="star">★</span><span class="star">✦</span></div>
+      <div class="cloud c1"></div><div class="cloud c2"></div><div class="planet">🪐</div>
+      <div class="home-content">
+        <div class="home-copy">
+          <div class="tagline">Belajar Matematika dengan Cara yang Seru! ✨</div>
+          <h1>PULAN</h1>
+          <div class="subtitle">Petualangan Peluang</div>
+          <button class="start-btn" onclick="go('level1')">MULAI <span>▶</span></button>
+        </div>
+        <div class="scene">
+          <div class="hill1"></div><div class="hill2"></div><div class="path-home"></div>
+          <div class="girl"><div class="hair"></div><div class="hair2"></div><div class="char-head"></div><div class="eye2 l"></div><div class="eye2 r"></div><div class="smile2"></div><div class="body-char"></div><div class="arm2 l"></div><div class="arm2 r"></div><div class="book-char"></div><div class="bag-char"></div></div>
+          <div class="rabbit" style="left:45%;bottom:25px"><div class="ear l"><div class="inner-ear"></div></div><div class="ear r"><div class="inner-ear"></div></div><div class="rabbit-body"><div class="face-r"><div class="eye-r l"></div><div class="eye-r r"></div><div class="nose-r"></div><div class="smile-r"></div></div></div></div>
+        </div>
+      </div>
+    </div>
+    <div class="home-links"><button onclick="go('level1')">📖<br>Materi</button><button onclick="go('level3')">📝<br>Latihan</button><button onclick="go('level4')">👑<br>Final Boss</button></div>
+  </div>
+</section>
+
+<section class="screen" id="level1">
+  <div class="top"><div class="top-left"><button class="back" onclick="go('home')">←</button><div class="level-pill">Level 1 — Jelajahi Konsep</div></div><div class="progress-wrap"><div class="progress-dots"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span></div><span class="progress-num">1/5</span></div></div>
+  <div class="main game-bg">
+    <div class="level1-head">
+      <div><div class="speech">Yuk, pahami dulu konsep dasar peluang! 🐰</div><h2 class="screen-title">Konsep Penting</h2><p class="screen-lead">Kenali istilahnya, lalu lihat contoh konkretnya supaya rumus tidak terasa asing.</p></div>
+      <div class="mascot-area"><div class="girl"><div class="hair"></div><div class="hair2"></div><div class="char-head"></div><div class="eye2 l"></div><div class="eye2 r"></div><div class="smile2"></div><div class="body-char"></div><div class="arm2 l"></div><div class="arm2 r"></div><div class="book-char"></div><div class="bag-char"></div></div><div class="rabbit"><div class="ear l"><div class="inner-ear"></div></div><div class="ear r"><div class="inner-ear"></div></div><div class="rabbit-body"><div class="face-r"><div class="eye-r l"></div><div class="eye-r r"></div><div class="nose-r"></div><div class="smile-r"></div></div></div></div></div>
+    </div>
+    <div class="concept-ribbon">🌷 Konsep Dasar</div>
+    <div class="concept-grid">
+      <div class="concept-card"><div style="font-size:26px">🎲</div><h4>Ruang Sampel</h4><p>Semua hasil yang mungkin terjadi.</p><div class="mini-work">Dadu → {1,2,3,4,5,6}</div></div>
+      <div class="concept-card"><div style="font-size:26px">⭐</div><h4>Titik Sampel</h4><p>Satu hasil tertentu dari ruang sampel.</p><div class="mini-work">Contoh: angka 4</div></div>
+      <div class="concept-card"><div style="font-size:26px">💚</div><h4>Kejadian</h4><p>Kumpulan hasil yang memenuhi syarat.</p><div class="mini-work">Genap → {2,4,6}</div></div>
+      <div class="concept-card"><div style="font-size:26px">📊</div><h4>Peluang</h4><p>Ukuran seberapa mungkin kejadian terjadi.</p><div class="mini-work">0 = mustahil • 1 = pasti</div></div>
+    </div>
+    <div class="formula">P(A) = <span style="font-size:24px">n(A)</span> / <span style="font-size:24px">n(S)</span><small>kejadian yang diinginkan ÷ seluruh kemungkinan</small></div>
+    <div class="concrete-grid">
+      <div class="concrete"><div class="tag">CONTOH KONKRET • DADU</div><h4>Peluang muncul angka lebih dari 4</h4><p>Yang lebih dari 4 adalah 5 dan 6. Jadi ada 2 hasil yang diinginkan dari 6 kemungkinan.</p><div class="mini-work">P(A)=2/6=<b>1/3</b></div></div>
+      <div class="concrete"><div class="tag">CONTOH KONKRET • KEHIDUPAN</div><h4>Peluang hujan 70%</h4><p>Angka 70% menunjukkan kemungkinan hujan. Peluang tidak hujan merupakan komplemennya.</p><div class="mini-work">P(tidak hujan)=1−0,70=<b>0,30</b></div></div>
+    </div>
+    <div class="next-row"><button class="green-btn" onclick="go('level2')">Lanjut ke Eksplorasi ▶</button></div>
+  </div>
+</section>
+
+<section class="screen" id="level2">
+  <div class="top"><div class="top-left"><button class="back" onclick="go('level1')">←</button><div class="level-pill">Level 2 — Eksplorasi</div></div><div class="progress-wrap"><div class="progress-dots"><span class="dot on"></span><span class="dot on"></span><span class="dot"></span><span class="dot"></span><span class="dot"></span></div><span class="progress-num">2/5</span></div></div>
+  <div class="main">
+    <div class="screen-inner"><div class="speech">Sekarang, coba kamu selesaikan tantangan ini! 🎯</div><h2 class="screen-title">Eksplorasi Peluang</h2><p class="screen-lead">Gunakan konsep yang sudah dipelajari untuk membaca sebuah situasi.</p></div>
+    <div class="level2-layout">
+      <div class="wheel-card"><div class="wheel"></div><div class="pointer">▼</div><h4>Roda Putar</h4><p style="font-size:12px;color:var(--muted);margin:5px 0">8 bagian sama besar</p><div class="mini-work">3 pink • 2 kuning • 2 hijau • 1 ungu</div></div>
+      <div class="explore-card"><h4>Sebuah roda memiliki 8 bagian sama besar.</h4><p>3 bagian berwarna pink, 2 bagian kuning, 2 bagian hijau, dan 1 bagian ungu. Peluang berhenti pada warna kuning adalah ...</p><div class="choice-grid" id="exploreChoices"><button class="choice" data-a="1/8">A. 1/8</button><button class="choice" data-a="1/4">B. 1/4</button><button class="choice" data-a="2/8">C. 2/8</button><button class="choice" data-a="1/2">D. 1/2</button></div><div class="feedback" id="exploreFb"></div><div class="next-row" style="padding:12px 0 0"><button class="green-btn" id="exploreNext" disabled onclick="go('level3')">🔒 Selesaikan mini game</button></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="screen" id="level3">
+  <div class="top"><div class="top-left"><button class="back" onclick="go('level2')">←</button><div class="level-pill">Level 3 — Latihan Soal</div></div><div class="progress-wrap"><div class="progress-dots"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot"></span></div><span class="progress-num">3/5</span></div></div>
+  <div class="main quiz-wrap">
+    <div class="quiz-status"><span class="status-pill">⭐ Skor: <span id="score">0</span></span><span class="status-pill">Nyawa: <span id="hearts">💗💗💗</span></span></div>
+    <div class="quiz-card"><div class="tag">SOAL <span id="qNo">1</span></div><h4 id="qText"></h4><div class="opt-grid" id="qOptions"></div><div class="feedback" id="qFeedback"></div><div class="next-row" style="padding:12px 0 0"><button class="green-btn" id="qNext" style="display:none">Lanjut ▶</button></div></div>
+    <div class="coach-row"><div class="coach">🐰 <b>Pesan Bani:</b> tuliskan dulu ruang sampelnya. Setelah itu baru hitung peluangnya!</div><div class="score-badge">+100 poin untuk jawaban benar</div></div>
+  </div>
+</section>
+
+<section class="screen" id="level4">
+  <div class="top"><div class="top-left"><button class="back" onclick="go('level3')">←</button><div class="level-pill">Level 4 — Final Boss</div></div><div class="progress-wrap"><div class="progress-dots"><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span><span class="dot on"></span></div><span class="progress-num">4/5</span></div></div>
+  <div class="main">
+    <div class="boss-banner"><div><div class="tag">TANTANGAN TERAKHIR!</div><h2 class="boss-title">FINAL BOSS 👑</h2><p class="screen-lead">Buktikan kamu sudah menguasai peluang.</p></div><div class="cat-boss">🐈‍⬛</div></div>
+    <div class="boss-card"><div class="tag">BOSS <span id="bNo">1</span>/3</div><h4 id="bText"></h4><div class="opt-grid" id="bOptions"></div><div class="feedback" id="bFeedback"></div><div class="boss-actions"><button class="green-btn" id="bNext" style="display:none">Tantangan berikutnya ▶</button></div></div>
+  </div>
+</section>
+
+<section class="screen" id="result">
+  <div class="top"><div class="top-left"><div class="gear">★</div><div class="level-pill">Petualangan Selesai</div></div><div class="profile"><span>🐰</span> Badge</div></div>
+  <div class="main result-wrap">
+    <div class="result-hero"><div style="font-size:44px">🌟</div><h2 id="resultTitle">Hebat!</h2><p>Kamu berhasil melewati semua level PULAN.<br>Konsep, eksplorasi, latihan, sampai Final Boss.</p><div class="result-character"><div class="girl"><div class="hair"></div><div class="hair2"></div><div class="char-head"></div><div class="eye2 l"></div><div class="eye2 r"></div><div class="smile2"></div><div class="body-char"></div><div class="arm2 l"></div><div class="arm2 r"></div><div class="book-char"></div><div class="bag-char"></div></div><div class="rabbit"><div class="ear l"><div class="inner-ear"></div></div><div class="ear r"><div class="inner-ear"></div></div><div class="rabbit-body"><div class="face-r"><div class="eye-r l"></div><div class="eye-r r"></div><div class="nose-r"></div><div class="smile-r"></div></div></div></div></div></div>
+    <div class="final-card"><div class="tag">SKOR AKHIR</div><div class="final-score"><span id="finalScore">0</span> / 1000</div><p style="font-size:12px;color:var(--muted);line-height:1.5">Kamu sudah berlatih memahami kemungkinan, menentukan kejadian, dan menghitung peluang.</p><div class="badge" id="badge">✨ Penjelajah Peluang</div><div style="display:flex;gap:9px;justify-content:center;margin-top:17px"><button class="green-btn" onclick="restart()">↻ Main Lagi</button><button class="green-btn" style="background:#e6b7d0;border-bottom-color:#cc96b3" onclick="go('home')">⌂ Menu</button></div></div>
+  </div>
+</section>
+
+</div>
+<div class="toast" id="toast"></div>
+<script>
+const screens=['home','level1','level2','level3','level4','result'];
+let score=0,qi=0,bi=0,lives=3,locked=false;
+const qs=[
+ {q:'Sebuah dadu dilempar sekali. Peluang muncul angka 3 adalah ...',o:['1/6','1/3','1/2','2/3'],a:0,e:'Hanya ada 1 hasil yang diinginkan dari 6 kemungkinan → 1/6.'},
+ {q:'Sebuah kantong berisi 3 bola merah dan 2 bola biru. Peluang mengambil bola biru adalah ...',o:['1/5','2/5','3/5','4/5'],a:1,e:'Ada 2 bola biru dari total 5 bola → 2/5.'},
+ {q:'Dadu dilempar sekali. Peluang muncul bilangan genap adalah ...',o:['1/6','1/3','1/2','2/3'],a:2,e:'Bilangan genap: 2,4,6. Jadi 3/6 = 1/2.'},
+ {q:'Angka 1–10 dipilih secara acak. Peluang mendapat bilangan prima adalah ...',o:['2/10','3/10','4/10','5/10'],a:2,e:'Bilangan prima: 2,3,5,7. Ada 4 dari 10 → 4/10.'},
+ {q:'Jika peluang hujan adalah 0,25, maka peluang tidak hujan adalah ...',o:['0,25','0,50','0,75','1,25'],a:2,e:'Peluang komplemen = 1 − 0,25 = 0,75.'}
+];
+const bs=[
+ {q:'Roda memiliki 8 bagian sama besar. 3 bagian berwarna pink. Peluang berhenti pada pink adalah ...',o:['1/8','2/8','3/8','5/8'],a:2,e:'3 bagian pink dari 8 bagian → 3/8.'},
+ {q:'Dua koin dilempar bersamaan. Banyak titik sampel yang mungkin adalah ...',o:['2','3','4','6'],a:2,e:'AA, AG, GA, GG → ada 4 titik sampel.'},
+ {q:'Sebuah dadu dilempar. Peluang muncul angka yang bukan 1 adalah ...',o:['1/6','1/3','1/2','5/6'],a:3,e:'Ada 5 hasil selain angka 1 dari 6 hasil → 5/6.'}
+];
+function go(id){screens.forEach(s=>document.getElementById(s).classList.remove('active'));document.getElementById(id).classList.add('active');window.scrollTo({top:0,behavior:'smooth'});if(id==='level3')renderQ();if(id==='level4')renderB();}
+function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(window.__t);window.__t=setTimeout(()=>t.classList.remove('show'),1800)}
+function renderScore(){document.getElementById('score').textContent=score}
+
+document.getElementById('exploreChoices').addEventListener('click',e=>{const b=e.target.closest('.choice');if(!b)return;document.querySelectorAll('#exploreChoices .choice').forEach(x=>x.classList.remove('correct','wrong'));const fb=document.getElementById('exploreFb');fb.classList.add('show');if(b.dataset.a==='1/4'){b.classList.add('correct');fb.innerHTML='✅ <b>Benar!</b> Ada 2 bagian kuning dari 8 bagian → 2/8 = <b>1/4</b>.';document.getElementById('exploreNext').disabled=false;document.getElementById('exploreNext').textContent='Mulai Latihan 📝';score+=50;renderScore();toast('+50 poin');}else{b.classList.add('wrong');fb.innerHTML='💡 Belum tepat. Bagian kuning ada 2 dari 8, jadi peluangnya 2/8 = <b>1/4</b>.'}});
+function renderQ(){locked=false;const x=qs[qi];document.getElementById('qNo').textContent=qi+1;document.getElementById('qText').textContent=x.q;document.getElementById('qFeedback').className='feedback';document.getElementById('qNext').style.display='none';document.getElementById('hearts').textContent='💗'.repeat(lives)+'🩶'.repeat(3-lives);const box=document.getElementById('qOptions');box.innerHTML='';x.o.forEach((t,i)=>{const b=document.createElement('button');b.className='opt';b.textContent=String.fromCharCode(65+i)+'. '+t;b.onclick=()=>answerQ(i,b);box.appendChild(b)})}
+function answerQ(i,b){if(locked)return;locked=true;const x=qs[qi],all=[...document.querySelectorAll('#qOptions .opt')];all.forEach(v=>v.disabled=true);if(i===x.a){b.classList.add('correct');score+=100;toast('+100 poin');document.getElementById('qFeedback').innerHTML='🌟 <b>Benar!</b> '+x.e}else{b.classList.add('wrong');all[x.a].classList.add('correct');lives=Math.max(0,lives-1);document.getElementById('qFeedback').innerHTML='💡 <b>Belum tepat.</b> '+x.e}renderScore();document.getElementById('hearts').textContent='💗'.repeat(lives)+'🩶'.repeat(3-lives);document.getElementById('qFeedback').classList.add('show');const n=document.getElementById('qNext');n.textContent=qi===qs.length-1?'Masuk Final Boss 👑':'Lanjut ▶';n.style.display='inline-block'}
+document.getElementById('qNext').onclick=()=>{if(qi<qs.length-1){qi++;renderQ()}else{bi=0;go('level4')}};
+function renderB(){locked=false;const x=bs[bi];document.getElementById('bNo').textContent=bi+1;document.getElementById('bText').textContent=x.q;document.getElementById('bFeedback').className='feedback';document.getElementById('bNext').style.display='none';const box=document.getElementById('bOptions');box.innerHTML='';x.o.forEach((t,i)=>{const b=document.createElement('button');b.className='opt';b.textContent=String.fromCharCode(65+i)+'. '+t;b.onclick=()=>answerB(i,b);box.appendChild(b)})}
+function answerB(i,b){if(locked)return;locked=true;const x=bs[bi],all=[...document.querySelectorAll('#bOptions .opt')];all.forEach(v=>v.disabled=true);if(i===x.a){b.classList.add('correct');score+=150;toast('+150 poin');document.getElementById('bFeedback').innerHTML='👑 <b>Boss dikalahkan!</b> '+x.e}else{b.classList.add('wrong');all[x.a].classList.add('correct');document.getElementById('bFeedback').innerHTML='💡 '+x.e}renderScore();document.getElementById('bFeedback').classList.add('show');const n=document.getElementById('bNext');n.textContent=bi===bs.length-1?'Lihat Hasil 🏆':'Tantangan berikutnya ▶';n.style.display='inline-block'}
+document.getElementById('bNext').onclick=()=>{if(bi<bs.length-1){bi++;renderB()}else finish()};
+function finish(){go('result');document.getElementById('finalScore').textContent=Math.min(score,1000);document.getElementById('resultTitle').textContent=score>=800?'Hebat! 👑':score>=550?'Keren! 🌟':'Tetap Semangat! 🌱';document.getElementById('badge').textContent=score>=800?'✨ Master Peluang':score>=550?'🌈 Pejuang Peluang':'🌱 Penjelajah Peluang'}
+function restart(){score=0;qi=0;bi=0;lives=3;locked=false;document.getElementById('exploreNext').disabled=true;document.getElementById('exploreNext').textContent='🔒 Selesaikan mini game';document.getElementById('exploreFb').className='feedback';renderScore();go('home')}
+</script>
+</body>
+</html>
